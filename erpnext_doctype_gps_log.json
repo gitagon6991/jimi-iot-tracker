@@ -1,0 +1,17 @@
+{
+  "doctype": "DocType",
+  "name": "GPS Log",
+  "module": "Vehicles",
+  "custom": 1,
+  "fields": [
+    {"fieldname":"device_imei","fieldtype":"Data","label":"Device IMEI","reqd":1},
+    {"fieldname":"latitude","fieldtype":"Float","label":"Latitude"},
+    {"fieldname":"longitude","fieldtype":"Float","label":"Longitude"},
+    {"fieldname":"speed_kmh","fieldtype":"Float","label":"Speed (km/h)"},
+    {"fieldname":"timestamp","fieldtype":"Datetime","label":"Timestamp"},
+    {"fieldname":"raw_payload","fieldtype":"Text","label":"Raw Payload"}
+  ],
+  "permissions": [
+    {"role":"System Manager","read":1,"write":1,"create":1,"delete":1}
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "latest": {
+    "JIMI123": {
+      "imei": "JIMI123",
+      "latitude": -1.2921,
+      "longitude": 36.8219,
+      "speed_kmh": 80.0,
+      "timestamp": "2025-11-04T12:07:26.127695Z",
+      "raw": {
+        "imei": "JIMI123",
+        "lat": -1.2921,
+        "lon": 36.8219,
+        "speed": 80,
+        "ignition": true
+      }
+    }
+  },
+  "logs": {
+    "JIMI123": [
+      {
+        "imei": "JIMI123",
+        "latitude": -1.2921,
+        "longitude": 36.8219,
+        "speed_kmh": 80.0,
+        "timestamp": "2025-11-04T12:07:26.127695Z",
+        "raw": {
+          "imei": "JIMI123",
+          "lat": -1.2921,
+          "lon": 36.8219,
+          "speed": 80,
+          "ignition": true
+        }
+      },
+      {
+        "imei": "JIMI123",
+        "latitude": -1.2921,
+        "longitude": 36.8219,
+        "speed_kmh": 80.0,
+        "timestamp": "2025-11-04T11:52:46.085784Z",
+        "raw": {
+          "imei": "JIMI123",
+          "lat": -1.2921,
+          "lon": 36.8219,
+          "speed": 80,
+          "ignition": true
+        }
+      },
+      {
+        "imei": "JIMI123",
+        "latitude": -1.2921,
+        "longitude": 36.8219,
+        "speed_kmh": 80.0,
+        "timestamp": "2025-11-04T11:25:22.548264Z",
+        "raw": {
+          "imei": "JIMI123",
+          "lat": -1.2921,
+          "lon": 36.8219,
+          "speed": 80,
+          "ignition": true
+        }
+      }
+    ]
+  }
+}

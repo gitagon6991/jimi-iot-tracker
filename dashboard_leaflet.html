@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>JIMI IoT Car Tracker Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background: #f9f9f9;
+    }
+
+    header {
+      background: #0d6efd;
+      color: white;
+      padding: 12px 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    #map {
+      flex: 1;
+      height: 60vh;
+    }
+
+    #controls {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+    }
+
+    #filter {
+      padding: 6px 10px;
+      width: 250px;
+      font-size: 14px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      background: #fff;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #f2f2f2;
+    }
+
+    .status {
+      font-size: 18px;
+    }
+
+    footer {
+      background: #f1f1f1;
+      text-align: center;
+      padding: 8px;
+      font-size: 13px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <header>JIMI IoT Car Tracker Dashboard</header>
+
+  <div id="controls">
+    <input id="filter" placeholder="Search IMEI...">
+    <div>Auto-refresh: <strong>Every 10s</strong></div>
+  </div>
+
+  <div id="map"></div>
+
+  <table id="deviceTable">
+    <thead>
+      <tr>
+        <th>IMEI</th>
+        <th>Latitude</th>
+        <th>Longitude</th>
+        <th>Speed (km/h)</th>
+        <th>Last Update</th>
+        <th>ERP Sync</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <footer>JIMI IoT Tracker © 2025 | Live updates every 10 seconds</footer>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([-1.2921, 36.8219], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+    }).addTo(map);
+
+    const deviceMarkers = {};
+    const deviceTrails = {};
+
+    function getIcon(speed) {
+      const color = speed > 0 ? "green" : "red";
+      return L.icon({
+        iconUrl: `/static/icons/car-${color}.png`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16],
+      });
+    }
+
+    async function fetchDevices() {
+      try {
+        const res = await fetch("/api/devices");
+        const devices = await res.json();
+        updateMapAndTable(devices);
+      } catch (err) {
+        console.error("Fetch error:", err);
+      }
+    }
+
+    function updateMapAndTable(devices) {
+      const tbody = document.querySelector("#deviceTable tbody");
+      tbody.innerHTML = "";
+
+      devices.forEach(device => {
+        const { imei, lat, lon, speed, timestamp, erp_synced, trail } = device;
+
+        // Update or create map marker
+        if (!deviceMarkers[imei]) {
+          deviceMarkers[imei] = L.marker([lat, lon], { icon: getIcon(speed) }).addTo(map);
+        } else {
+          deviceMarkers[imei].setLatLng([lat, lon]);
+          deviceMarkers[imei].setIcon(getIcon(speed));
+        }
+
+        // Draw last 10-point trail
+        if (trail && trail.length > 0) drawTrail(imei, trail);
+
+        // Add row to table
+        const row = document.createElement("tr");
+        row.dataset.imei = imei;
+        row.innerHTML = `
+          <td>${imei}</td>
+          <td>${lat.toFixed(5)}</td>
+          <td>${lon.toFixed(5)}</td>
+          <td>${speed}</td>
+          <td>${timestamp}</td>
+          <td class="status">${erp_synced ? "✅" : "⚠️"}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function drawTrail(imei, positions) {
+      const latlngs = positions.map(p => [p.lat, p.lon]);
+      if (deviceTrails[imei]) map.removeLayer(deviceTrails[imei]);
+      deviceTrails[imei] = L.polyline(latlngs, { color: "blue" }).addTo(map);
+    }
+
+    // Search filter
+    document.getElementById("filter").addEventListener("input", e => {
+      const val = e.target.value.toLowerCase();
+      document.querySelectorAll("#deviceTable tbody tr").forEach(row => {
+        row.style.display = row.dataset.imei.toLowerCase().includes(val) ? "" : "none";
+      });
+    });
+
+    // Auto-refresh every 10 seconds
+    fetchDevices();
+    setInterval(fetchDevices, 10000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>JIMI Tracker Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body{font-family: Inter, system-ui, Arial; margin:18px}
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid #eee;text-align:left}
+    .small{font-size:0.9rem;color:#666}
+    .maplink{display:inline-block;padding:6px 8px;border-radius:6px;background:#f2f2f2;text-decoration:none;color:#333}
+  </style>
+</head>
+<body>
+  <h2>JIMI IoT Car Tracker Dashboard</h2>
+  <p class="small">Auto-refresh every 3s. Click coordinates to open Google Maps.</p>
+
+  <table id="vehicles">
+    <thead>
+      <tr><th>IMEI / ID</th><th>Lat</th><th>Lng</th><th>Speed (km/h)</th><th>Timestamp</th><th>Map</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchLatest(){
+      const res = await fetch('/api/latest');
+      if(!res.ok) return;
+      const data = await res.json();
+      const tbody = document.querySelector('#vehicles tbody');
+      tbody.innerHTML = '';
+      const keys = Object.keys(data).sort();
+      for(const k of keys){
+        const p = data[k];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${k}</strong></td>
+          <td>${p.latitude ?? ''}</td>
+          <td>${p.longitude ?? ''}</td>
+          <td>${p.speed_kmh ?? ''}</td>
+          <td>${p.timestamp ?? ''}</td>
+          <td><a class="maplink" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}">Open Map</a></td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    fetchLatest();
+    setInterval(fetchLatest, 3000);
+  </script>
+</body>
+</html>

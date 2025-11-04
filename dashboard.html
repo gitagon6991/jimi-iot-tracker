@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JIMI IoT Car Tracker Dashboard</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    #map { height: 70vh; width: 100%; }
+    #table-container { padding: 15px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">JIMI IoT Car Tracker Dashboard</h2>
+  <div id="map"></div>
+  <div id="table-container">
+    <h3>Last Known Locations</h3>
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>IMEI</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Speed (km/h)</th>
+          <th>Timestamp (UTC)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <script>
+    const map = L.map('map').setView([0, 37], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const markers = {};
+
+    async function loadData() {
+      const res = await fetch('/api/latest');
+      const data = await res.json();
+      const tbody = document.querySelector("#data-table tbody");
+      tbody.innerHTML = "";
+
+      for (const imei in data) {
+        const item = data[imei];
+        const { latitude, longitude, speed_kmh, timestamp } = item;
+
+        // --- Table update ---
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${imei}</td>
+          <td>${latitude.toFixed(5)}</td>
+          <td>${longitude.toFixed(5)}</td>
+          <td>${speed_kmh}</td>
+          <td>${timestamp}</td>
+        `;
+        tbody.appendChild(row);
+
+        // --- Map update ---
+        if (!markers[imei]) {
+          markers[imei] = L.marker([latitude, longitude]).addTo(map)
+            .bindPopup(`<b>${imei}</b><br>Speed: ${speed_kmh} km/h`);
+        } else {
+          markers[imei].setLatLng([latitude, longitude])
+            .setPopupContent(`<b>${imei}</b><br>Speed: ${speed_kmh} km/h`);
+        }
+      }
+    }
+
+    // Auto-refresh every 10 seconds
+    loadData();
+    setInterval(loadData, 10000);
+  </script>
+</body>
+</html>
