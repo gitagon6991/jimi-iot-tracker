@@ -1,4 +1,4 @@
-# Jimi IoT Car Tracker 🚗
+# Jimi IoT Car Tracker 
 
 A FastAPI + Leaflet.js project for tracking vehicle telemetry in real-time.
 
