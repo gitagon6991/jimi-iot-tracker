@@ -50,7 +50,7 @@ def parse_payload(payload: dict):
 
     if isinstance(timestamp, (int, float)):
         ts_iso = datetime.fromtimestamp(timestamp, tz=timezone.utc).isoformat().replace("+00:00", "Z")
-        # ts_iso = datetime.utcfromtimestamp(int(timestamp)).isoformat() + "Z"
+
     else:
         try:
             # try parse ISO-ish
