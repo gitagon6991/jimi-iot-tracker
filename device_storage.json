@@ -1,0 +1,52 @@
+{
+  "latest": {
+    "imei": {
+      "imei": "3345689",
+      "device": "iot",
+      "lat": -1.2345,
+      "long": 23,
+      "speed": 5
+    },
+    "3345689": {
+      "imei": "3345689",
+      "device": "iot",
+      "lat": -1.2345,
+      "long": 23,
+      "speed": 5
+    }
+  },
+  "logs": {
+    "33356890": [
+      {
+        "imei": "33356890",
+        "device": "iot",
+        "lat": -1.2345,
+        "long": 23,
+        "speed": 5
+      },
+      {
+        "imei": "33356890",
+        "device": "iot",
+        "lat": -1.2345,
+        "long": 23,
+        "speed": 5
+      }
+    ],
+    "3345689": [
+      {
+        "imei": "3345689",
+        "device": "iot",
+        "lat": -1.2345,
+        "long": 23,
+        "speed": 5
+      },
+      {
+        "imei": "3345689",
+        "device": "iot",
+        "lat": -1.2345,
+        "long": 23,
+        "speed": 5
+      }
+    ]
+  }
+}
