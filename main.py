@@ -154,6 +154,37 @@ def latest():
 def log_for_imei(imei: str, limit: Optional[int] = 100):
     return storage.get_log_for_imei(imei, limit)
 
+#update fast API (Jan 8th)
+@app.get("/api/devices")
+def api_devices():
+    """
+    Return a JSON of all devices with their last 5 points (trail) and ERP sync status.
+    """
+    devices = {}
+    for imei, logs in storage.data.get("logs", {}).items():
+        # Only last 5 points for trail
+        trail_points = logs[:5][::-1]  # oldest first for map trails
+
+        # Fill missing timestamp safely
+        for p in trail_points:
+            if "timestamp" not in p:
+                p["timestamp"] = "unknown"
+
+        devices[imei] = {
+            "trail": [
+                {
+                    "lat": p.get("latitude"),
+                    "lon": p.get("longitude"),
+                    "speed": p.get("speed_kmh"),
+                    "timestamp": p.get("timestamp")
+                }
+                for p in trail_points
+            ],
+            "latest": storage.data["latest"].get(imei, {}),
+            "erp_synced": storage.data["latest"].get(imei, {}).get("erp_synced", False)
+        }
+    return devices
+
 # simple manual test push from form (useful for browser testing)
 @app.post("/test/push")
 async def test_push(imei: str = Form(...), lat: float = Form(...), lon: float = Form(...), speed: float = Form(0)):
